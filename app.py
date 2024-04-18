@@ -18,7 +18,7 @@ app = Flask(__name__)
 app.secret_key = '12345678'
 
 
-nimgs = 10
+nimgs = 20
 
 # Saving Date today in 2 different formats
 datetoday = date.today().strftime("%m_%d_%y")
