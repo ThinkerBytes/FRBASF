@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Face Recognition Based Attendance System</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <!-- Add these lines to include Bootstrap JS and Popper.js -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.min.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+	<link rel="stylesheet" href="{{ url_for('static', filename='assets/css/main.css')}}" />
+		<noscript><link rel="stylesheet" href="{{ url_for('static', filename='assets/css/noscript.css')}}" /></noscript>
+    <style>
+        body {
+            
+            background-size: cover;
+            font-family: sans-serif;
+            margin-top: 40px;
+            height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+
+        table {
+            border: 1px;
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 86%;
+            margin: auto;
+        }
+
+        td,
+        th {
+            border: 1px solid black !important;
+            padding: 8px; /* Adjusted padding for better alignment */
+        }
+
+        tr:nth-child(even) {
+            background-color: #dddddd;
+        }
+    </style>
+</head>
+
+
+<body class="homepage is-preload">
+    <div id="page-wrapper">
+        <!-- Header -->
+        <div id="header">
+            <!-- Inner -->
+            <div class="inner">
+                <header>
+                    <h1><a href="/" id="logo">Automatic Attendance System</a></h1>
+                    <hr />
+                    {% if mess%}
+                    <p class="text-center" style="color: red;font-size: 20px;">{{ mess }}</p>
+                    {% endif %}
+                </header>
+                <footer>
+                    <a href="#banner" class="button circled scrolly">Start</a>
+                </footer>
+                <!-- Add this section at the top of your HTML body -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endwith %}
+
+<!-- Rest of your HTML body content -->
+            </div>
+            <!-- Nav -->
+            <nav id="nav">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="#banner">Take Attendence</a></li>
+                    <li><a href="#banner">Add new user</a></li>
+                    <li><a href="/listusers">List users</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Banner -->
+        <section id="banner">
+
+            <header>
+                <h2>Face Recognition Based Automatic Attendance System.</h2>
+                <p>
+                    <h6>
+                        Click on the Take attendance button to start automatic taking of attendance. Press the esc button when you are done, and the list of attendees will be displayed.<br>
+                        Enter the Name, ID of entries and click add user to add a new user. While adding a new user, the camera will open up and capture the face image of that user.
+                    </h6>
+                </p>
+            </header>
+
+            <div class="container mt-5">
+                <div class="row">
+                    <!-- Today's Attendance -->
+<div class="col-md-6">
+    <div class="card mb-3">
+        <div class="card-header" style="background-color: #0b4c61; color: white;">
+            Today's Attendance <i class="material-icons">assignment</i>
+        </div>
+        <div class="card-body">
+            <a href="/start" class="btn btn-primary btn-lg btn-block">Take Attendance <i class="material-icons">beenhere</i></a>
+            <a href="/newperiod" class="btn btn-warning btn-lg btn-block">New Period</a> <!-- New button for a new period -->
+            <table class="table mt-3">
+                <thead>
+                    <tr>
+                        <th>S No</th>
+                        <th>Name</th>
+                        <th>ID</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if l %}
+                    {% for i in range(l) %}
+                    <tr>
+                        <td>{{ i+1 }}</td>
+                        <td>{{ names[i] }}</td>
+                        <td>{{ rolls[i] }}</td>
+                        <td>{{ times[i] }}</td>
+                    </tr>
+                    {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+                    <!-- Add New User -->
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-header" style="background-color: #0b4c61; color: white;">
+                                Add New User <i class="material-icons">control_point_duplicate</i>
+                            </div>
+                            <div class="card-body">
+                                <form action='/add' method="POST" enctype="multipart/form-data">
+                                    <label for="newusername" class="form-label">Enter New User Name*</label>
+                                    <input type="text" id="newusername" name='newusername' class="form-control" required>
+                                    <label for="newuserid" class="form-label mt-3">Enter New User Id*</label>
+                                    <input type="number" id="newuserid" name='newuserid' class="form-control" required>
+                                    <button type='submit' class='btn btn-dark mt-3 btn-lg btn-block'>Add New User</button>
+                                    <h5 class="mt-4"><i>Total Users in Database: {{totalreg}}</i></h5><a class="btn btn-secondary" href="/listusers"> List users</a>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+			
+			<!-- Footer -->
+				<div id="footer">
+					<div class="container">
+						
+						<div class="row">
+							<div class="col-12">
+
+								<!-- Contact -->
+									<section class="contact">
+										<header>
+											<h3>Automatic Attendence System</h3>
+										</header>
+										<p>Face Recognition based automatic attendence sytem webapp, developed using python flask.</p>
+										<ul class="icons">
+											<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+											<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+											<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+											<li><a href="#" class="icon brands fa-pinterest"><span class="label">Pinterest</span></a></li>
+											<li><a href="#" class="icon brands fa-dribbble"><span class="label">Dribbble</span></a></li>
+											<li><a href="#" class="icon brands fa-linkedin-in"><span class="label">Linkedin</span></a></li>
+										</ul>
+									</section>
+
+								<!-- Copyright -->
+									<div class="copyright">
+										<ul class="menu">
+											<li>&copy; python. All rights reserved.</li><li>Design: Flask
+										</ul>
+									</div>
+
+							</div>
+
+						</div>
+					</div>
+				</div>
+
+		</div>
+
+		<!-- Scripts -->
+			<script src="{{ url_for('static', filename='assets/js/jquery.min.js')}}"></script>
+			<script src="{{ url_for('static', filename='assets/js/jquery.dropotron.min.js')}}"></script>
+			<script src="{{ url_for('static', filename='assets/js/jquery.scrolly.min.js')}}"></script>
+			<script src="{{ url_for('static', filename='assets/js/jquery.scrollex.min.js')}}"></script>
+			<script src="{{ url_for('static', filename='assets/js/browser.min.js')}}"></script>
+			<script src="{{ url_for('static', filename='assets/js/breakpoints.min.js')}}"></script>
+			<script src="{{ url_for('static', filename='assets/js/util.js')}}"></script>
+			<script src="{{ url_for('static', filename='assets/js/main.js')}}"></script>
+
+	</body>
+</html>
